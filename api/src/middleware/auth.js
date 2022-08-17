@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 export default class Authentication {
   /**
@@ -7,24 +7,24 @@ export default class Authentication {
      */
   static requireRole (requiredRole) {
     return (req, res, next) => {
-      const userRoles = res.locals.user.roles
-      console.log(requiredRole)
+      const userRoles = res.locals.user.roles;
+      console.log(requiredRole);
       try {
         if (userRoles.includes(requiredRole)) {
-          next()
+          next();
         } else {
           res.status(403).json({
             error: true,
             message: 'Permission denied'
-          })
-          return
+          });
+          return;
         }
       } catch (err) {
         res.status(500).json({
           error: true
-        })
+        });
       }
-    }
+    };
   }
 
   /**
@@ -32,18 +32,19 @@ export default class Authentication {
      */
   static verifyJWT () {
     return (req, res, next) => {
-      const token = req.headers['x-access-token']
+      const token = req.headers['x-access-token'];
       if (token) {
+        // eslint-disable-next-line no-undef
         jwt.verify(token, process.env.SECRET, (err, decoded) => {
           if (err) {
-            return res.status(401).json({ error: true, message: 'Unauthorized access.' })
+            return res.status(401).json({ error: true, message: 'Unauthorized access.' });
           }
-          res.locals.user = decoded
-          next()
-        })
+          res.locals.user = decoded;
+          next();
+        });
       } else {
-        res.status(401).json({ error: true, messsage: 'Missing token.' })
+        res.status(401).json({ error: true, messsage: 'Missing token.' });
       }
-    }
+    };
   }
 }
