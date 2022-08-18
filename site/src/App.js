@@ -1,15 +1,25 @@
 import logo from './logo.svg';
 import './App.css';
-import { Box } from '@mui/material';
-import PcTable from './components/PcTable';
+import Index from './routes/Index'
+import Login from './routes/Login'
+import UserList from './routes/UserList'
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  Link,
+  Routes
+} from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <Box>
-        <PcTable />
-      </Box>
-    </div>
+    <BrowserRouter>
+      <Routes>
+      <Route path='/' element={<Index />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/userlist' element={<UserList />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
