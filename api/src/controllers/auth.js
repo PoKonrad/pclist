@@ -82,7 +82,7 @@ router.post('/refreshToken', async (req, res) => {
   }
   const refToken = req.body.refreshToken;
 
-  const dbResp = await dbQuery('SELECT refresh.token, refresh.expiration as expiration, refresh.user_id as user_id, users.username FROM refresh INNER JOIN users ON users.id = user_id WHERE refresh.token = ?', [refToken]);
+  const dbResp = await dbQuery('SELECT refresh.token, refresh.expiration, refresh.user_id as user_id, users.username FROM refresh INNER JOIN users ON users.id = user_id WHERE refresh.token = ?', [refToken]);
 
   console.log(dbResp[0]);
   // Check if token expired

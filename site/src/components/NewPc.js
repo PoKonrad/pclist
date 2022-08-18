@@ -3,21 +3,25 @@ import { Box } from "@mui/system";
 import React, { useState } from "react";
 import api from '../scripts/api'
 
-const NewPc = ({ show }) => {
+const NewPc = ({ show, refreshTabData }) => {
   const [name, setName] = useState('');
   const [cpu, setCpu] = useState('');
   const [gpu, setGpu] = useState('');
   const [ram, setRam] = useState('');
+  const [inputsDisabled, setInputsDisabled] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
   try {
+    setInputsDisabled(true)
     await api.post('/api/data', {
         name: name,
         cpu: cpu,
         gpu: gpu,
         ram: ram
     }) 
+    setInputsDisabled(false)
+    await refreshTabData()
 } catch(error) {
     // To do
     }
@@ -41,7 +45,7 @@ const NewPc = ({ show }) => {
             margin: "2rem",
           }}
         >
-          Add or edit items.
+          Add items.
         </Typography>
         <form
           onSubmit={handleSubmit}
@@ -53,18 +57,22 @@ const NewPc = ({ show }) => {
           <TextField
             label="PC Name"
             onChange={(e) => setName(e.target.value)}
+            disabled={inputsDisabled}
           ></TextField>
           <TextField
             label="CPU"
             onChange={(e) => setCpu(e.target.value)}
+            disabled={inputsDisabled}
           ></TextField>
           <TextField
             label="GPU"
             onChange={(e) => setGpu(e.target.value)}
+            disabled={inputsDisabled}
           ></TextField>
           <TextField
             label="RAM"
             onChange={(e) => setRam(e.target.value)}
+            disabled={inputsDisabled}
           ></TextField>
           <Button
             type="submit"

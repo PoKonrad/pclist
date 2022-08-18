@@ -1,32 +1,12 @@
-import { Button, ButtonGroup, IconButton, Input, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
+import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import api from '../scripts/api.js'
 import PcTableRow from './PcTableRow.js';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import NewPc from './NewPc.js';
 
-// const rows = [
-//     {
-//         name: 'fghjghj',
-//         cpu: 'fghj',
-//         gpu: '4324',
-//         ram: '16GB'
-//     },
-//     {
-//         name: 'fgjhgfjh',
-//         cpu: 'fgjhghj',
-//         gpu: '4324',
-//         ram: '16GB'
-//     },
-//     {
-//         name: 'gfjh',
-//         cpu: 'ghjghj',
-//         gpu: '4324',
-//         ram: '16GB'
-//     }
-// ]
-
-const PcTable = () => {
+const PcTable = ({ newDialogShown }) => {
 
     const [rows, setRows] = useState()
     const [page, setPage] = useState(0)
@@ -44,9 +24,20 @@ const PcTable = () => {
         setRows(resp.data)
     }
 
+    const refreshTabData = async () => {
+        const resp = await api.get(`/api/data/${page * 5}-5`)
+        setRows(resp.data)
+    }
+
 
   return (
-    <TableContainer component={Paper} sx={{width: '100rem'}}>
+    <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%'
+    }}>
+    <NewPc show={newDialogShown} refreshTabData={refreshTabData}></NewPc>
+    <TableContainer component={Paper} sx={{width: '100%'}}>
         <Table aria-label='Table containing computers'>
             <TableHead>
                 <TableRow>
@@ -59,7 +50,7 @@ const PcTable = () => {
             </TableHead>
             <TableBody>
                 {rows ? rows.map((row) => (
-                    <PcTableRow row={row} />
+                    <PcTableRow row={row} refreshTabData={refreshTabData} />
                 )) : ""}
             </TableBody>
             <TableFooter>
@@ -68,6 +59,7 @@ const PcTable = () => {
             </TableFooter>
         </Table>
     </TableContainer>
+    </Box>
   )
  }
 

@@ -69,6 +69,7 @@ class api {
       });
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("refrteshToken");
+      sessionStorage.removeItem("userData");
     }
   }
   

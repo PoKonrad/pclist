@@ -65,6 +65,7 @@ const Login = () => {
         });
         api.token = resp.token;
         api.refreshToken = resp.refreshToken;
+        sessionStorage.setItem("userData", JSON.stringify(resp.userData));
         navigate("/", { replace: true });
       } catch (error) {
         const errMessage = await error.json();
@@ -79,8 +80,9 @@ const Login = () => {
           username: login,
           password: password,
         });
+        debugger;
         setLoading(false);
-        setAlert({ ...(await resp.json()), open: true });
+        setAlert({ ...(await resp), open: true });
         return;
       } catch (error) {
         const errMessage = await error.json();

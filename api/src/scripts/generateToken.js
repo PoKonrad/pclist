@@ -19,7 +19,7 @@ const generateToken = async (user, id, roles) => {
   const refreshToken = await cryptoRandomStringAsync({ length: 40 });
   // eslint-disable-next-line no-undef
   const token = jwt.sign(dataToSign, process.env.SECRET, { expiresIn: process.env.TOKEN_LIFE });
-  await dbQuery('DELETE FROM refresh WHERE user_id = ?', [id]);
+  //await dbQuery('DELETE FROM refresh WHERE user_id = ?', [id]);
   await dbQuery('INSERT INTO refresh (user_id, token, expiration) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 4 HOUR))', [id, refreshToken]);
 
   const response = {

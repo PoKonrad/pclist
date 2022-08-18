@@ -3,7 +3,7 @@ import { Box } from "@mui/system";
 import React, { useState } from "react";
 import api from '../scripts/api'
 
-const NewPc = ({ show, placeholders, id }) => {
+const NewPc = ({ show, placeholders, id, refreshTabData }) => {
   const [name, setName] = useState(placeholders.name);
   const [cpu, setCpu] = useState(placeholders.cpu);
   const [gpu, setGpu] = useState(placeholders.gpu);
@@ -12,12 +12,13 @@ const NewPc = ({ show, placeholders, id }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
   try {
-    await api.post(`/api/${id}/edit`, {
+    await api.post(`/api/data/${id}/edit`, {
         name: name,
         cpu: cpu,
         gpu: gpu,
         ram: ram
-    }) 
+    })
+    refreshTabData()
 } catch(error) {
     // To do
     }
@@ -41,7 +42,7 @@ const NewPc = ({ show, placeholders, id }) => {
             margin: "2rem",
           }}
         >
-          Add or edit items.
+          Edit items.
         </Typography>
         <form
           onSubmit={handleSubmit}
