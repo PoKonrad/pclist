@@ -1,18 +1,31 @@
-import { TextField, Paper, Tab, Tabs, Typography, Button, Backdrop, CircularProgress, Alert } from "@mui/material";
+import {
+  TextField,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
+  Button,
+  Backdrop,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 import { Box } from "@mui/system";
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import api from "../scripts/api";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [tabsState, setTabsState] = useState(0);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({
     message: "",
     open: false,
-    error: false
-  })
+    error: false,
+  });
   const [loginError, setLoginError] = useState({
     message: "",
     error: false,
@@ -45,11 +58,14 @@ const Login = () => {
 
     if (tabsState === 0) {
       try {
-        setLoading(true)
+        setLoading(true);
         const resp = await api.post("/api/auth/login", {
           username: login,
           password: password,
         });
+        api.token = resp.token;
+        api.refreshToken = resp.refreshToken;
+        navigate("/", { replace: true });
       } catch (error) {
         const errMessage = await error.json();
         setLoginError(errMessage);
@@ -59,11 +75,13 @@ const Login = () => {
     } else {
       try {
         setLoading(true);
-        api.post("/api/auth/register", {
+        const resp = await api.post("/api/auth/register", {
           username: login,
           password: password,
         });
         setLoading(false);
+        setAlert({ ...(await resp.json()), open: true });
+        return;
       } catch (error) {
         const errMessage = await error.json();
         setLoginError(errMessage);
@@ -144,7 +162,11 @@ const Login = () => {
           >
             {tabsState ? "Register" : "Login"}
           </Button>
-          {alert.open ? <Alert severity={alert.error ? "error" : "success"}>{alert.message}</Alert> : null}
+          {alert.open ? (
+            <Alert severity={alert.error ? "error" : "success"}>
+              {alert.message}
+            </Alert>
+          ) : null}
         </form>
       </Paper>
     </Box>
