@@ -1,20 +1,18 @@
-import {
-  TextField,
-  Paper,
-  Tab,
-  Tabs,
-  Typography,
-  Button,
-  FormControl,
-} from "@mui/material";
+import { TextField, Paper, Tab, Tabs, Typography, Button, Backdrop, CircularProgress, Alert } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
+import api from "../scripts/api";
 
 const Login = () => {
-
   const [tabsState, setTabsState] = useState(0);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false)
+  const [alert, setAlert] = useState({
+    message: "",
+    open: false,
+    error: false
+  })
   const [loginError, setLoginError] = useState({
     message: "",
     error: false,
@@ -28,37 +26,68 @@ const Login = () => {
     setTabsState(newValue);
   };
 
-  const handleForm = (e) => {
+  const handleForm = async (e) => {
     e.preventDefault();
     if (login.length === 0) {
       setLoginError({
         message: "Field cannot be empty.",
         error: true,
       });
-      if (password.length === 0) {
-        setPasswordError({
-          message: "Field cannot be empty.",
-          error: true,
+      return;
+    }
+    if (password.length === 0) {
+      setPasswordError({
+        message: "Field cannot be empty.",
+        error: true,
+      });
+      return;
+    }
+
+    if (tabsState === 0) {
+      try {
+        setLoading(true)
+        const resp = await api.post("/api/auth/login", {
+          username: login,
+          password: password,
         });
+      } catch (error) {
+        const errMessage = await error.json();
+        setLoginError(errMessage);
+        setPasswordError(errMessage);
+        setLoading(false);
+      }
+    } else {
+      try {
+        setLoading(true);
+        api.post("/api/auth/register", {
+          username: login,
+          password: password,
+        });
+        setLoading(false);
+      } catch (error) {
+        const errMessage = await error.json();
+        setLoginError(errMessage);
+        setPasswordError(errMessage);
+        setLoading(false);
       }
     }
-}
+  };
 
-    const handleLoginChange = (e) => {
-      setLoginError({
-        message: "",
-        error: false,
-      });
-      setLogin(e.target.value);
-    };
+  const handleLoginChange = (e) => {
+    setLoginError({
+      message: "",
+      error: false,
+    });
+    setLogin(e.target.value);
+  };
 
-    const handlePasswordChange = (e) => {
-      setPasswordError({
-        message: "",
-        error: false,
-      });
-      setPassword(e.target.value);
-    };
+  const handlePasswordChange = (e) => {
+    setPasswordError({
+      message: "",
+      error: false,
+    });
+    setPassword(e.target.value);
+  };
   return (
     <Box
       sx={{
@@ -67,6 +96,9 @@ const Login = () => {
         alignItems: "center",
       }}
     >
+      <Backdrop open={loading}>
+        <CircularProgress />
+      </Backdrop>
       <Paper
         sx={{
           width: "30rem",
@@ -112,6 +144,7 @@ const Login = () => {
           >
             {tabsState ? "Register" : "Login"}
           </Button>
+          {alert.open ? <Alert severity={alert.error ? "error" : "success"}>{alert.message}</Alert> : null}
         </form>
       </Paper>
     </Box>
