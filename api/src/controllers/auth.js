@@ -8,21 +8,25 @@ const router = new Router();
 router.post('/login', async (req, res) => {
   const postData = req.body;
   const dbResp = await dbQuery('SELECT id, username, password FROM users WHERE username = ?', [postData.username]);
+  if (!dbResp?.length) {
+    res.status(400).json({
+      error: true,
+      message: 'User or Password incorrect'
+    });
+    return;
+  }
   const roles = await dbQuery('SELECT role FROM user_roles WHERE user_id = ?', [dbResp[0].id]);
   const rolesArray = roles.map(el => el.role);
   console.log(rolesArray);
-  if (dbResp.length === 0) {
-    res.status(400).json('No such user');
-    return;
-  }
-
+  
   if (await argon2.verify(dbResp[0].password, postData.password)) {
     console.log('Success!');
     const token = await generateToken(dbResp[0].username, dbResp[0].id, rolesArray);
     res.status(200).json(token);
   } else {
     res.status(400).json({
-      err: 'wrongLogin'
+      error: true,
+      message: 'User or Password incorrect'
     });
   }
 });
