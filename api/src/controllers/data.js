@@ -43,10 +43,25 @@ router.post('/', Authentication.requireRole('admin'), async (req, res) => {
   }
 });
 
-router.patch('/', Authentication.requireRole('admin'), async (req, res) => {
+router.post('/:id/edit', Authentication.requireRole('admin'), async (req, res) => {
   const postData = req.body;
   try {
-    await dbQuery('UPDATE pcs SET name = ?, cpu = ?, gpu = ?, ram = ? WHERE id = ?', [postData.name, postData.cpu, postData.gpu, postData.ram, postData.id]);
+    await dbQuery('UPDATE pcs SET name = ?, cpu = ?, gpu = ?, ram = ? WHERE id = ?', [postData.name, postData.cpu, postData.gpu, postData.ram, req.params.id]);
+    res.status(200).json({
+      error: false,
+      message: 'Updated'
+    });
+  } catch(error) {
+    res.status(500).json({
+      error: true,
+      message: 'An error has occured',
+    });
+  }
+});
+
+router.post('/:id/delete', Authentication.requireRole('admin'), async (req, res) => {
+  try {
+    await dbQuery('DELETE FROM pcs WHERE id = ?', [req.params.id]);
     res.status(200).json({
       error: false,
       message: 'Updated'

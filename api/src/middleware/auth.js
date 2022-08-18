@@ -9,6 +9,7 @@ export default class Authentication {
     return (req, res, next) => {
       const userRoles = res.locals.user.roles;
       console.log(requiredRole);
+      console.warn(userRoles);
       try {
         if (userRoles.includes(requiredRole)) {
           next();

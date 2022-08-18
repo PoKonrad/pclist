@@ -82,10 +82,7 @@ router.post('/refreshToken', async (req, res) => {
   }
   const refToken = req.body.refreshToken;
 
-  const dbResp = await dbQuery('SELECT refresh.token, refresh.expiration, refresh.user_id, users.username FROM refresh INNER JOIN users ON users.id = refresh.user_id WHERE refresh.token = ?', [refToken]);
-  const roles = await dbQuery('SELECT role FROM user_roles WHERE user_id = ?', [dbResp[0].user_id]);
-  const rolesArray = roles.map(el => el.role);
-  console.log(rolesArray);
+  const dbResp = await dbQuery('SELECT refresh.token, refresh.expiration as expiration, refresh.user_id as user_id, users.username FROM refresh INNER JOIN users ON users.id = user_id WHERE refresh.token = ?', [refToken]);
 
   console.log(dbResp[0]);
   // Check if token expired
@@ -93,6 +90,11 @@ router.post('/refreshToken', async (req, res) => {
     res.status(400).json('Token Expired');
     return;
   }
+  
+  const roles = await dbQuery('SELECT role FROM user_roles WHERE user_id = ?', [dbResp[0].user_id]);
+  const rolesArray = roles.map(el => el.role);
+  console.log(rolesArray);
+
   const token = await generateToken(dbResp[0].username, dbResp[0].user_id, rolesArray);
   res.status(200).json(token);
 });
