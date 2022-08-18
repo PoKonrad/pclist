@@ -7,12 +7,23 @@ const router = Router();
 router.use(Authentication.verifyJWT());
 
 router.get(
-  '/:from-:to',
+  '/:offset-:count/:search?',
   Authentication.requireRole('user'),
   async (req, res) => {
-    const from = parseInt(req.params.from);
-    const to = parseInt(req.params.to);
-    const resp = await dbQuery('SELECT * FROM pcs LIMIT ?,?', [from, to]);
+    const offset = parseInt(req.params.offset);
+    const count = parseInt(req.params.count);
+
+    if (req.params?.search) {
+      const resp = await dbQuery('SELECT * FROM pcs WHERE name LIKE ? LIMIT ?,?', ['%' + req.params.search + '%', offset, count]);
+
+      res.status(200).json({
+        error: false,
+        data: resp,
+      });
+      return;
+    }
+    
+    const resp = await dbQuery('SELECT * FROM pcs LIMIT ?,?', [offset, count]);
 
     res.status(200).json({
       error: false,

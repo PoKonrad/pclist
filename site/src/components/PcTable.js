@@ -1,7 +1,9 @@
-import { Button, ButtonGroup, IconButton, Input, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material'
+import { Button, ButtonGroup, IconButton, Input, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import api from '../scripts/api.js'
 import PcTableRow from './PcTableRow.js';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 // const rows = [
 //     {
@@ -27,16 +29,21 @@ import PcTableRow from './PcTableRow.js';
 const PcTable = () => {
 
     const [rows, setRows] = useState()
+    const [page, setPage] = useState(0)
 
     useEffect(() => {
         const getData = async () => {
-            const resp = await api.get('/api/data/0-5')
+            const resp = await api.get(`/api/data/${page * 5}-5`)
             setRows(resp.data)
         }
         getData()
-        console.log(rows)
-    }, [])
-    
+    }, [page])
+
+    const handleSearch = async (e) => {
+        const resp = await api.get(`/api/data/${page * 5}-5/${e.target.value}`)
+        setRows(resp.data)
+    }
+
 
   return (
     <TableContainer component={Paper} sx={{width: '100rem'}}>
@@ -47,7 +54,7 @@ const PcTable = () => {
                     <TableCell><Typography>CPU</Typography></TableCell>
                     <TableCell><Typography>GPU</Typography></TableCell>
                     <TableCell><Typography>RAM</Typography></TableCell>
-                    <TableCell align='right'><Input></Input></TableCell>
+                    <TableCell align='right'><TextField label='Search' onChange={handleSearch}></TextField></TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -55,8 +62,11 @@ const PcTable = () => {
                     <PcTableRow row={row} />
                 )) : ""}
             </TableBody>
+            <TableFooter>
+                <IconButton onClick={() => page === 0 ? null : setPage(page - 1)}><KeyboardArrowLeftIcon /></IconButton>
+                <IconButton onClick={() => setPage(page + 1)}><KeyboardArrowRightIcon /></IconButton>
+            </TableFooter>
         </Table>
-        <TablePagination count={500}></TablePagination>
     </TableContainer>
   )
  }
